@@ -7,6 +7,8 @@ interface IMiningService {
     boolean startMining();
     boolean stopMining();
     boolean setCpuLimit(int percent);
+    boolean setWifiOnly(boolean enabled);
+    boolean setChargingOnly(boolean enabled);
     MiningStatus getStatus();
     long getHashrate();
     void registerCallback(IMiningCallback callback);

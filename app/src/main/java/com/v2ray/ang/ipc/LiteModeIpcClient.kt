@@ -24,6 +24,8 @@ data class LiteModeState(
     val uptimeSeconds: Long = 0L,
     val isCharging: Boolean = false,
     val isWifiConnected: Boolean = false,
+    val isWifiOnly: Boolean = false,
+    val isChargingOnly: Boolean = false,
     val errorMessage: String? = null
 )
 
@@ -56,6 +58,8 @@ class LiteModeIpcClient(private val context: Context) {
                     uptimeSeconds = status.uptimeSeconds,
                     isCharging = status.isCharging,
                     isWifiConnected = status.isWifiConnected,
+                    isWifiOnly = status.isWifiOnly,
+                    isChargingOnly = status.isChargingOnly,
                     errorMessage = null
                 )
             }
@@ -87,6 +91,8 @@ class LiteModeIpcClient(private val context: Context) {
                         uptimeSeconds = initialStatus.uptimeSeconds,
                         isCharging = initialStatus.isCharging,
                         isWifiConnected = initialStatus.isWifiConnected,
+                        isWifiOnly = initialStatus.isWifiOnly,
+                        isChargingOnly = initialStatus.isChargingOnly,
                         errorMessage = null
                     )
                 }
@@ -222,6 +228,26 @@ class LiteModeIpcClient(private val context: Context) {
             service.setCpuLimit(clamped)
         } catch (e: Exception) {
             Log.e(TAG, "setCpuLimit failed: ${e.message}", e)
+            false
+        }
+    }
+
+    fun setWifiOnly(enabled: Boolean): Boolean {
+        val service = miningService ?: return false
+        return try {
+            service.setWifiOnly(enabled)
+        } catch (e: Exception) {
+            Log.e(TAG, "setWifiOnly failed: ${e.message}", e)
+            false
+        }
+    }
+
+    fun setChargingOnly(enabled: Boolean): Boolean {
+        val service = miningService ?: return false
+        return try {
+            service.setChargingOnly(enabled)
+        } catch (e: Exception) {
+            Log.e(TAG, "setChargingOnly failed: ${e.message}", e)
             false
         }
     }

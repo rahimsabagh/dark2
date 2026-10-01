@@ -27,12 +27,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * Foreground service that hosts the mining execution engine.
+ * Foreground service that hosts the user-authorized background compute engine.
  *
  * Security & Lifecycle Guarantees:
  * - Only starts foreground execution when explicitly instructed via startMining()
  * - Strictly validates caller UID and signing certificate
- * - Provides an ongoing notification with real-time telemetry and a "Stop" action
+ * - Uses specialUse foreground service type with service-level subtype metadata property
+ * - Displays an ongoing notification with real-time telemetry and a "Stop" action
  * - No auto-start or boot persistence
  */
 class MiningHelperService : Service() {
@@ -76,6 +77,26 @@ class MiningHelperService : Service() {
             val result = engine.setCpuLimit(percent)
             if (isForegroundActive) {
                 updateNotification(engine.getStatus())
+            }
+            return result
+        }
+
+        override fun setWifiOnly(enabled: Boolean): Boolean {
+            enforceSecurity()
+            Log.i(TAG, "IPC setWifiOnly($enabled) invoked by UID ${Binder.getCallingUid()}")
+            val result = engine.setWifiOnly(enabled)
+            if (!engine.getStatus().isRunning && isForegroundActive) {
+                stopServiceForeground()
+            }
+            return result
+        }
+
+        override fun setChargingOnly(enabled: Boolean): Boolean {
+            enforceSecurity()
+            Log.i(TAG, "IPC setChargingOnly($enabled) invoked by UID ${Binder.getCallingUid()}")
+            val result = engine.setChargingOnly(enabled)
+            if (!engine.getStatus().isRunning && isForegroundActive) {
+                stopServiceForeground()
             }
             return result
         }
@@ -147,16 +168,16 @@ class MiningHelperService : Service() {
         isForegroundActive = true
 
         val notification = buildNotification(engine.getStatus())
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 NOTIFICATION_ID,
                 notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
-        Log.i(TAG, "Promoted service to Foreground Service")
+        Log.i(TAG, "Promoted service to Foreground Service (specialUse)")
     }
 
     private fun stopServiceForeground() {

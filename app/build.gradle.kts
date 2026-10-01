@@ -48,8 +48,14 @@ android {
     debug { signingConfig = signingConfigs.getByName("debugConfig") }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    isCoreLibraryDesugaringEnabled = true
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+  sourceSets {
+    getByName("main") {
+      jniLibs.srcDirs("libs")
+    }
   }
   buildFeatures {
     compose = true
@@ -75,7 +81,22 @@ googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.W
 // Some unused dependencies are commented out below instead of being removed.
 // This makes it easy to add them back in the future if needed.
 dependencies {
+  coreLibraryDesugaring(libs.desugar.jdk.libs)
+  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
   implementation(project(":aidl-contract"))
+  implementation(libs.androidx.appcompat)
+  implementation(libs.mmkv.static)
+  implementation(libs.gson)
+  implementation(libs.zxing.core)
+  implementation(libs.work.runtime.ktx)
+  implementation(libs.work.multiprocess)
+  implementation(libs.reorderable)
+  implementation(libs.coil.compose)
+  implementation("io.coil-kt.coil3:coil:3.1.0")
+  implementation(libs.androidx.camera.core)
+  implementation(libs.androidx.camera.camera2)
+  implementation(libs.androidx.camera.lifecycle)
+  implementation(libs.camera.compose)
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
   // implementation(libs.accompanist.permissions)

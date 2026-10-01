@@ -8,7 +8,7 @@
 
     <!-- Foreground service and notification permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -21,17 +21,21 @@
         <!--
             Foreground Service:
             - Exported with signature-level permission protection
+            - Uses specialUse foreground service type with designated subtype property
             - Runs as a Foreground Service ONLY when the user explicitly starts mining
             - No auto-start, no boot receiver
         -->
         <service
             android:name=".service.MiningHelperService"
             android:exported="true"
-            android:foregroundServiceType="dataSync"
+            android:foregroundServiceType="specialUse"
             android:permission="com.v2ray.helper.permission.BIND_MINING_SERVICE">
             <intent-filter>
                 <action android:name="com.v2ray.helper.ACTION_BIND_MINING" />
             </intent-filter>
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-authorized background compute and network verification service" />
         </service>
 
         <!-- No Launcher Activity or launcher category intent-filter. The Helper APK is headless. -->

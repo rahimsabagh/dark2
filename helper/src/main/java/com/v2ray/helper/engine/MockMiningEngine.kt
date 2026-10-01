@@ -38,16 +38,16 @@ class MockMiningEngine(
     private var cpuLimitPercent: Int = DEFAULT_CPU_LIMIT
     private var uptimeSeconds: Long = 0L
 
-    // Constraint flags for future resource-aware mining policy
+    // Constraint flags for resource-aware mining policy
     var requireChargingOnly: Boolean = false
     var requireWifiOnly: Boolean = false
     var batteryProtectionEnabled: Boolean = true
     var temperatureProtectionEnabled: Boolean = true
 
-    // Internal simulation flags
-    var simulatedIsCharging: Boolean = true
-    var simulatedIsWifi: Boolean = true
-    var simulatedTemperatureCelsius: Float = 36.5f
+    // Real device state tracking / simulated telemetry
+    var isCharging: Boolean = true
+    var isWifiConnected: Boolean = true
+    var temperatureCelsius: Float = 36.5f
 
     private var tickerJob: Job? = null
 
@@ -59,12 +59,14 @@ class MockMiningEngine(
         if (isRunning) return true
 
         // Validate policy constraints before starting
-        if (requireChargingOnly && !simulatedIsCharging) {
-            broadcastError("Cannot start: Device is not charging")
+        if (requireChargingOnly && !isCharging) {
+            broadcastError("Cannot start: Device is not plugged in / charging")
+            updateAndBroadcastStatus("PAUSED_NOT_CHARGING")
             return false
         }
-        if (requireWifiOnly && !simulatedIsWifi) {
+        if (requireWifiOnly && !isWifiConnected) {
             broadcastError("Cannot start: Device is not connected to Wi-Fi")
+            updateAndBroadcastStatus("PAUSED_NO_WIFI")
             return false
         }
 
@@ -93,6 +95,32 @@ class MockMiningEngine(
 
         if (changed) {
             updateAndBroadcastStatus(if (isRunning) "ACTIVE" else "STOPPED")
+        }
+        return true
+    }
+
+    @Synchronized
+    fun setWifiOnly(enabled: Boolean): Boolean {
+        requireWifiOnly = enabled
+        if (enabled && isRunning && !isWifiConnected) {
+            // Immediately enforce constraint and pause/stop execution
+            stopMining()
+            updateAndBroadcastStatus("PAUSED_NO_WIFI")
+        } else {
+            updateAndBroadcastStatus()
+        }
+        return true
+    }
+
+    @Synchronized
+    fun setChargingOnly(enabled: Boolean): Boolean {
+        requireChargingOnly = enabled
+        if (enabled && isRunning && !isCharging) {
+            // Immediately enforce constraint and pause/stop execution
+            stopMining()
+            updateAndBroadcastStatus("PAUSED_NOT_CHARGING")
+        } else {
+            updateAndBroadcastStatus()
         }
         return true
     }
@@ -136,8 +164,10 @@ class MockMiningEngine(
             hashrateHps = currentHashrate,
             statusMessage = statusMsg,
             uptimeSeconds = uptimeSeconds,
-            isCharging = simulatedIsCharging,
-            isWifiConnected = simulatedIsWifi,
+            isCharging = isCharging,
+            isWifiConnected = isWifiConnected,
+            isWifiOnly = requireWifiOnly,
+            isChargingOnly = requireChargingOnly,
             isThrottled = false
         )
     }

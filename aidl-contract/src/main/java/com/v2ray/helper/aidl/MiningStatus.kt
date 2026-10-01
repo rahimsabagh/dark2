@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 /**
- * Parcelable data class representing the real-time operational status
- * and telemetry of the mining helper service.
+ * Parcelable data class representing the real-time operational status,
+ * policy constraints, and telemetry of the mining helper service.
  */
 data class MiningStatus(
     val isRunning: Boolean = false,
@@ -15,6 +15,8 @@ data class MiningStatus(
     val uptimeSeconds: Long = 0L,
     val isCharging: Boolean = false,
     val isWifiConnected: Boolean = false,
+    val isWifiOnly: Boolean = false,
+    val isChargingOnly: Boolean = false,
     val isThrottled: Boolean = false
 ) : Parcelable {
 
@@ -26,6 +28,8 @@ data class MiningStatus(
         uptimeSeconds = parcel.readLong(),
         isCharging = parcel.readByte() != 0.toByte(),
         isWifiConnected = parcel.readByte() != 0.toByte(),
+        isWifiOnly = parcel.readByte() != 0.toByte(),
+        isChargingOnly = parcel.readByte() != 0.toByte(),
         isThrottled = parcel.readByte() != 0.toByte()
     )
 
@@ -37,6 +41,8 @@ data class MiningStatus(
         parcel.writeLong(uptimeSeconds)
         parcel.writeByte(if (isCharging) 1 else 0)
         parcel.writeByte(if (isWifiConnected) 1 else 0)
+        parcel.writeByte(if (isWifiOnly) 1 else 0)
+        parcel.writeByte(if (isChargingOnly) 1 else 0)
         parcel.writeByte(if (isThrottled) 1 else 0)
     }
 
