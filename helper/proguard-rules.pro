@@ -1,0 +1,2 @@
+-keep class com.v2ray.helper.aidl.** { *; }
+-keep class com.v2ray.helper.service.** { *; }

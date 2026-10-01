@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">v2rayNG</string>
+    <string name="title_lite_mode">Lite Mode</string>
+    <string name="lite_mode_subtitle">User-controlled computing resource contributor</string>
+    <string name="lite_mode_disclaimer">Lite Mode performs computational tasks using device CPU resources. Mining never starts automatically, respects strict CPU allocation limits, and can be halted at any moment.</string>
+    <string name="cpu_limit_title">CPU Utilization Limit</string>
+    <string name="action_start_mining">Start Mining</string>
+    <string name="action_stop_mining">Stop Mining</string>
+    <string name="charging_only_title">Run Only While Charging</string>
+    <string name="wifi_only_title">Run Only on Wi-Fi</string>
+    <string name="battery_protection_title">Thermal &amp; Battery Protection</string>
+    <string name="helper_status_connected">Helper Service: Bound &amp; Verified</string>
+    <string name="helper_status_disconnected">Helper Service: Disconnected</string>
+    <string name="helper_status_not_installed">Helper APK Not Installed or Not Responding</string>
+</resources>

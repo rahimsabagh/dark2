@@ -1,0 +1,6 @@
+{
+  "name": "v2rayNG",
+  "description": "Modified v2rayNG client with user-controlled Lite Mode and secure Helper service IPC",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

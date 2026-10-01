@@ -1,0 +1,1 @@
+-keep class com.v2ray.helper.aidl.** { *; }
